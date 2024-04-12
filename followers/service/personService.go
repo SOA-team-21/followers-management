@@ -23,3 +23,13 @@ func (s *PersonService) GetProfile(userId string) (*model.Person, error) {
 	}
 	return person, nil
 }
+
+func (s *PersonService) Follow(userIdToFollow, userIdFollower string) error {
+	err := s.repo.Follow(userIdToFollow, userIdFollower)
+	return err
+}
+
+func (s *PersonService) UnFollow(userIdToUnFollow, userIdFollower string) error {
+	err := s.repo.Follow(userIdToUnFollow, userIdFollower)
+	return err
+}

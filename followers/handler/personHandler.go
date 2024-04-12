@@ -39,3 +39,45 @@ func (p *PersonHanlder) GetProfile(rw http.ResponseWriter, h *http.Request) {
 	}
 	rw.WriteHeader(http.StatusOK)
 }
+
+func (p *PersonHanlder) Follow(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	userIdToFollow := vars["toFollow"]
+	userIdFollower := vars["follower"]
+	if userIdToFollow == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+	if userIdFollower == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+
+	err := p.service.Follow(userIdToFollow, userIdFollower)
+	if err != nil {
+		http.Error(rw, "Unable to follow", http.StatusBadRequest)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+}
+
+func (p *PersonHanlder) UnFollow(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	userIdToUnFollow := vars["toUnFollow"]
+	userIdFollower := vars["follower"]
+	if userIdToUnFollow == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+	if userIdFollower == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+
+	err := p.service.Follow(userIdToUnFollow, userIdFollower)
+	if err != nil {
+		http.Error(rw, "Unable to unfollow", http.StatusBadRequest)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+}

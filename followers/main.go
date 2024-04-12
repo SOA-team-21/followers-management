@@ -17,6 +17,8 @@ func startServer(handler *handler.PersonHanlder, port string) {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/followers/profile/{userId}", handler.GetProfile).Methods("GET")
+	router.HandleFunc("/followers/{toFollow}/{follower}", handler.Follow).Methods("POST")
+	router.HandleFunc("/followers/{toUnFollow}/{follower}", handler.UnFollow).Methods("DELETE")
 
 	println("Server starting")
 	log.Fatal(http.ListenAndServe(port, router))

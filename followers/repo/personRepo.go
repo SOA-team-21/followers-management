@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"followers.xws.com/model"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -108,4 +109,88 @@ func (pr *PersonRepo) GetPerson(userId string) (*model.Person, error) {
 		return person, nil
 	}
 	return nil, fmt.Errorf("unexpected result type from Neo4j query")
+}
+
+func (repo *PersonRepo) Follow(userIdToFollow, userIdFollower string) error {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	toFollow, err := strconv.ParseInt(userIdToFollow, 10, 64)
+	if err != nil {
+		return err
+	}
+	follower, err := strconv.ParseInt(userIdFollower, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	query := `
+		MATCH (p:Person {userId: $followerId}), (p1:Person {userId: $toFollowId})
+		CREATE (p)-[:IS_FOLLOWING {since: $date}]->(p1)
+	`
+
+	isFollowing, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				query,
+				map[string]interface{}{"followerId": follower, "toFollowId": toFollow, "date": time.Now().Format("2006-01-02")})
+			if err != nil {
+				return nil, err
+			}
+
+			if result.Next(ctx) {
+				return result.Record().Values[0], nil
+			}
+
+			return nil, result.Err()
+		})
+	if err != nil {
+		repo.logger.Println("Error inserting relationship:", err)
+		return err
+	}
+	repo.logger.Println("Relationship created successfully: ", isFollowing.(string))
+	return nil
+}
+
+func (repo *PersonRepo) UnFollow(userIdToUnFollow, userIdFollower string) error {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	toUnFollow, err := strconv.ParseInt(userIdToUnFollow, 10, 64)
+	if err != nil {
+		return err
+	}
+	follower, err := strconv.ParseInt(userIdFollower, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	query := `
+		MATCH (p:Person {userId: $followerId})-[r:IS_FOLLOWING]->(p1:Person {userId: $toUnFollowId})
+		DELETE r
+	`
+
+	isFollowing, err := session.ExecuteWrite(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				query,
+				map[string]interface{}{"followerId": follower, "toUnFollowId": toUnFollow})
+			if err != nil {
+				return nil, err
+			}
+
+			if result.Next(ctx) {
+				return result.Record().Values[0], nil
+			}
+
+			return nil, result.Err()
+		})
+	if err != nil {
+		repo.logger.Println("Error unfollowing:", err)
+		return err
+	}
+	repo.logger.Println("Relationship deleted successfully: ", isFollowing.(string))
+	return nil
 }
