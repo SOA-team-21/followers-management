@@ -24,6 +24,14 @@ func (s *PersonService) GetProfile(userId string) (*model.Person, error) {
 	return person, nil
 }
 
+func (s *PersonService) GetFollowers(userId string) (model.Followers, error) {
+	people, err := s.repo.GetFollowers(userId)
+	if err != nil {
+		return nil, err
+	}
+	return people, nil
+}
+
 func (s *PersonService) Follow(userIdToFollow, userIdFollower string) error {
 	err := s.repo.Follow(userIdToFollow, userIdFollower)
 	return err

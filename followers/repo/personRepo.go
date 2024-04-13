@@ -126,9 +126,11 @@ func (repo *PersonRepo) Follow(userIdToFollow, userIdFollower string) error {
 	}
 
 	query := `
-		MATCH (p:Person {userId: $followerId}), (p1:Person {userId: $toFollowId})
-		CREATE (p)-[:IS_FOLLOWING {since: $date}]->(p1)
-	`
+        MATCH (p:Person {userId: $followerId}), (p1:Person {userId: $toFollowId})
+        MERGE (p)-[r:IS_FOLLOWING]->(p1)
+        ON CREATE SET r.since = $date
+        RETURN r
+    `
 
 	_, err = session.ExecuteWrite(ctx,
 		func(transaction neo4j.ManagedTransaction) (any, error) {
@@ -149,7 +151,7 @@ func (repo *PersonRepo) Follow(userIdToFollow, userIdFollower string) error {
 		repo.logger.Println("Error inserting relationship:", err)
 		return err
 	}
-	repo.logger.Println("Relationship created successfully: ")
+	repo.logger.Println("Relationship created successfully")
 	return nil
 }
 
@@ -193,4 +195,54 @@ func (repo *PersonRepo) UnFollow(userIdToUnFollow, userIdFollower string) error 
 	}
 	repo.logger.Println("Relationship deleted successfully")
 	return nil
+}
+
+func (repo *PersonRepo) GetFollowers(userId string) (model.Followers, error) {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	userIdInt, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+		MATCH (f:Person)-[:IS_FOLLOWING]->(p:Person {userId: $userId})
+		RETURN f.userId as userId, f.name as name, f.surname as surname, f.quote as quote, f.email as email
+	`
+
+	followersResults, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				query,
+				map[string]interface{}{"userId": userIdInt})
+			if err != nil {
+				return nil, err
+			}
+			var followers model.Followers
+			for result.Next(ctx) {
+				record := result.Record()
+				userId, _ := record.Get("userId")
+				name, _ := record.Get("name")
+				surname, _ := record.Get("surname")
+				quote, _ := record.Get("quote")
+				email, _ := record.Get("email")
+
+				person := &model.Follower{
+					UserId:  userId.(int64),
+					Name:    name.(string),
+					Surname: surname.(string),
+					Quote:   quote.(string),
+					Email:   email.(string),
+				}
+				followers = append(followers, person)
+			}
+			return followers, nil
+		})
+	if err != nil {
+		repo.logger.Println("Error querying search:", err)
+		return nil, err
+	}
+	return followersResults.(model.Followers), nil
 }

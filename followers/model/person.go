@@ -17,6 +17,14 @@ type Person struct {
 	Email   string
 }
 
+type Follower struct {
+	UserId  int64 `json:"userId"`
+	Name    string
+	Surname string
+	Quote   string
+	Email   string
+}
+
 func (person *Person) Validate() error {
 	if person.Name == "" {
 		return errors.New("invalid name")
@@ -30,7 +38,7 @@ func (person *Person) Validate() error {
 	return nil
 }
 
-type People []*Person
+type Followers []*Follower
 
 func (o *Person) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
@@ -42,7 +50,7 @@ func (o *Person) ToJSON(w io.Writer) error {
 	return e.Encode(o)
 }
 
-func (o *People) ToJSON(w io.Writer) error {
+func (o *Followers) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(o)
 }
