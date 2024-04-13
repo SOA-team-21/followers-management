@@ -64,6 +64,30 @@ func (p *PersonHanlder) GetFollowers(rw http.ResponseWriter, h *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
+func (p *PersonHanlder) GetRecommended(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	userId := vars["userId"]
+	if userId == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+
+	people, err := p.service.GetRecommended(userId)
+	if err != nil {
+		return
+	}
+	if people != nil {
+		fmt.Println("Found followers")
+	}
+
+	err = people.ToJSON(rw)
+	if err != nil {
+		http.Error(rw, "Unable to convert to json", http.StatusInternalServerError)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
+}
+
 func (p *PersonHanlder) Follow(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	userIdToFollow := vars["toFollow"]
