@@ -74,7 +74,7 @@ func (p *PersonHanlder) UnFollow(rw http.ResponseWriter, h *http.Request) {
 		return
 	}
 
-	err := p.service.Follow(userIdToUnFollow, userIdFollower)
+	err := p.service.UnFollow(userIdToUnFollow, userIdFollower)
 	if err != nil {
 		http.Error(rw, "Unable to unfollow", http.StatusBadRequest)
 		return

@@ -130,7 +130,7 @@ func (repo *PersonRepo) Follow(userIdToFollow, userIdFollower string) error {
 		CREATE (p)-[:IS_FOLLOWING {since: $date}]->(p1)
 	`
 
-	isFollowing, err := session.ExecuteWrite(ctx,
+	_, err = session.ExecuteWrite(ctx,
 		func(transaction neo4j.ManagedTransaction) (any, error) {
 			result, err := transaction.Run(ctx,
 				query,
@@ -149,7 +149,7 @@ func (repo *PersonRepo) Follow(userIdToFollow, userIdFollower string) error {
 		repo.logger.Println("Error inserting relationship:", err)
 		return err
 	}
-	repo.logger.Println("Relationship created successfully: ", isFollowing.(string))
+	repo.logger.Println("Relationship created successfully: ")
 	return nil
 }
 
@@ -172,7 +172,7 @@ func (repo *PersonRepo) UnFollow(userIdToUnFollow, userIdFollower string) error 
 		DELETE r
 	`
 
-	isFollowing, err := session.ExecuteWrite(ctx,
+	_, err = session.ExecuteWrite(ctx,
 		func(transaction neo4j.ManagedTransaction) (any, error) {
 			result, err := transaction.Run(ctx,
 				query,
@@ -191,6 +191,6 @@ func (repo *PersonRepo) UnFollow(userIdToUnFollow, userIdFollower string) error 
 		repo.logger.Println("Error unfollowing:", err)
 		return err
 	}
-	repo.logger.Println("Relationship deleted successfully: ", isFollowing.(string))
+	repo.logger.Println("Relationship deleted successfully")
 	return nil
 }

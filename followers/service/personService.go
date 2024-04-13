@@ -30,6 +30,6 @@ func (s *PersonService) Follow(userIdToFollow, userIdFollower string) error {
 }
 
 func (s *PersonService) UnFollow(userIdToUnFollow, userIdFollower string) error {
-	err := s.repo.Follow(userIdToUnFollow, userIdFollower)
+	err := s.repo.UnFollow(userIdToUnFollow, userIdFollower)
 	return err
 }
