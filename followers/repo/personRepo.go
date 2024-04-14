@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -18,9 +19,9 @@ type PersonRepo struct {
 
 func New(logger *log.Logger) (*PersonRepo, error) {
 	//TODO: Initialize connection to db
-	uri := "bolt://localhost:7687"
-	user := "neo4j"
-	pass := "followers"
+	uri := os.Getenv("NEO4J_DB")
+	user := os.Getenv("NEO4J_USERNAME")
+	pass := os.Getenv("NEO4J_PASS")
 	auth := neo4j.BasicAuth(user, pass, "")
 
 	driver, err := neo4j.NewDriverWithContext(uri, auth)
@@ -77,7 +78,6 @@ func (pr *PersonRepo) GetPerson(userId string) (*model.Person, error) {
 
 			if result.Next(ctx) {
 				record := result.Record()
-				id, _ := record.Get("id")
 				userId, _ := record.Get("userId")
 				name, _ := record.Get("name")
 				surname, _ := record.Get("surname")
@@ -87,7 +87,6 @@ func (pr *PersonRepo) GetPerson(userId string) (*model.Person, error) {
 				email, _ := record.Get("email")
 
 				person := &model.Person{
-					Id:      id.(int64),
 					UserId:  userId.(int64),
 					Name:    name.(string),
 					Surname: surname.(string),
