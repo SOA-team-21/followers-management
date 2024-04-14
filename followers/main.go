@@ -20,6 +20,7 @@ func startServer(handler *handler.PersonHanlder, port string) {
 	router.HandleFunc("/followers/{userId}/followers", handler.GetFollowers).Methods("GET")
 	router.HandleFunc("/followers/{userId}/following", handler.GetFollowing).Methods("GET")
 	router.HandleFunc("/followers/{userId}/recommended", handler.GetRecommended).Methods("GET")
+	router.HandleFunc("/followers/{userId}/{followingUserId}/isFollowing", handler.IsFollowing).Methods("GET")
 	router.HandleFunc("/followers/{toFollow}/{follower}", handler.Follow).Methods("POST")
 	router.HandleFunc("/followers/{toUnFollow}/{follower}", handler.UnFollow).Methods("DELETE")
 

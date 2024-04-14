@@ -112,6 +112,30 @@ func (p *PersonHanlder) GetRecommended(rw http.ResponseWriter, h *http.Request) 
 	rw.WriteHeader(http.StatusOK)
 }
 
+func (p *PersonHanlder) IsFollowing(rw http.ResponseWriter, h *http.Request) {
+	vars := mux.Vars(h)
+	userId := vars["userId"]
+	if userId == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+	followingUserId := vars["followingUserId"]
+	if followingUserId == "" {
+		http.Error(rw, "Unable to convert limit to integer", http.StatusBadRequest)
+		return
+	}
+	isFollowing, err := p.service.IsFollowing(userId, followingUserId)
+	if err != nil {
+		http.Error(rw, "Error", http.StatusBadRequest)
+		return
+	}
+	if isFollowing {
+		rw.WriteHeader(http.StatusOK) //200 is following
+		return
+	}
+	rw.WriteHeader(http.StatusForbidden) // 403 isn't following
+}
+
 func (p *PersonHanlder) Follow(rw http.ResponseWriter, h *http.Request) {
 	vars := mux.Vars(h)
 	userIdToFollow := vars["toFollow"]
@@ -146,7 +170,7 @@ func (p *PersonHanlder) UnFollow(rw http.ResponseWriter, h *http.Request) {
 		return
 	}
 
-	err := p.service.UnFollow(userIdToUnFollow, userIdFollower)
+	err := p.service.Unfollow(userIdToUnFollow, userIdFollower)
 	if err != nil {
 		http.Error(rw, "Unable to unfollow", http.StatusBadRequest)
 		return

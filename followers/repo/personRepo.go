@@ -349,3 +349,43 @@ func (repo *PersonRepo) GetFollowing(userId string) (model.Followers, error) {
 	}
 	return followersResults.(model.Followers), nil
 }
+
+func (repo *PersonRepo) IsFollowing(userId, followingUserId string) (bool, error) {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	userIdInt, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		return false, err
+	}
+
+	followingUserIdInt, err := strconv.ParseInt(followingUserId, 10, 64)
+	if err != nil {
+		return false, err
+	}
+
+	query := `
+		MATCH (f:Person {userId: $userId})-[:IS_FOLLOWING]->(p:Person {userId: $followingUserId})
+		RETURN p.name as name
+	`
+
+	followersResults, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				query,
+				map[string]interface{}{"userId": userIdInt, "followingUserId": followingUserIdInt})
+			if err != nil {
+				return false, err
+			}
+			if result.Next(ctx) {
+				return true, nil
+			}
+			return false, nil
+		})
+	if err != nil {
+		repo.logger.Println("Error querying search:", err)
+		return false, err
+	}
+	return followersResults.(bool), nil
+}

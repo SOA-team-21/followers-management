@@ -48,12 +48,20 @@ func (s *PersonService) GetRecommended(userId string) (model.Followers, error) {
 	return people, nil
 }
 
+func (s *PersonService) IsFollowing(userId, followingUserId string) (bool, error) {
+	isFollowing, err := s.repo.IsFollowing(userId, followingUserId)
+	if err != nil {
+		return false, err
+	}
+	return isFollowing, nil
+}
+
 func (s *PersonService) Follow(userIdToFollow, userIdFollower string) error {
 	err := s.repo.Follow(userIdToFollow, userIdFollower)
 	return err
 }
 
-func (s *PersonService) UnFollow(userIdToUnFollow, userIdFollower string) error {
+func (s *PersonService) Unfollow(userIdToUnFollow, userIdFollower string) error {
 	err := s.repo.UnFollow(userIdToUnFollow, userIdFollower)
 	return err
 }
