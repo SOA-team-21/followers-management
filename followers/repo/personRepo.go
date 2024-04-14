@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -18,9 +19,9 @@ type PersonRepo struct {
 
 func New(logger *log.Logger) (*PersonRepo, error) {
 	//TODO: Initialize connection to db
-	uri := "bolt://localhost:7687"
-	user := "neo4j"
-	pass := "followers"
+	uri := os.Getenv("NEO4J_DB")
+	user := os.Getenv("NEO4J_USERNAME")
+	pass := os.Getenv("NEO4J_PASS")
 	auth := neo4j.BasicAuth(user, pass, "")
 
 	driver, err := neo4j.NewDriverWithContext(uri, auth)
