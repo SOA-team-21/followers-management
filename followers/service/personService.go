@@ -1,0 +1,67 @@
+package service
+
+import (
+	"log"
+
+	"followers.xws.com/model"
+	"followers.xws.com/repo"
+)
+
+type PersonService struct {
+	logger *log.Logger
+	repo   *repo.PersonRepo
+}
+
+func NewPersonService(l *log.Logger, r *repo.PersonRepo) *PersonService {
+	return &PersonService{l, r}
+}
+
+func (s *PersonService) GetProfile(userId string) (*model.Person, error) {
+	person, err := s.repo.GetPerson(userId)
+	if err != nil {
+		return nil, err
+	}
+	return person, nil
+}
+
+func (s *PersonService) GetFollowers(userId string) (model.Followers, error) {
+	people, err := s.repo.GetFollowers(userId)
+	if err != nil {
+		return nil, err
+	}
+	return people, nil
+}
+
+func (s *PersonService) GetFollowing(userId string) (model.Followers, error) {
+	people, err := s.repo.GetFollowing(userId)
+	if err != nil {
+		return nil, err
+	}
+	return people, nil
+}
+
+func (s *PersonService) GetRecommended(userId string) (model.Followers, error) {
+	people, err := s.repo.GetRecommended(userId)
+	if err != nil {
+		return nil, err
+	}
+	return people, nil
+}
+
+func (s *PersonService) IsFollowing(userId, followingUserId string) (bool, error) {
+	isFollowing, err := s.repo.IsFollowing(userId, followingUserId)
+	if err != nil {
+		return false, err
+	}
+	return isFollowing, nil
+}
+
+func (s *PersonService) Follow(userIdToFollow, userIdFollower string) error {
+	err := s.repo.Follow(userIdToFollow, userIdFollower)
+	return err
+}
+
+func (s *PersonService) Unfollow(userIdToUnFollow, userIdFollower string) error {
+	err := s.repo.UnFollow(userIdToUnFollow, userIdFollower)
+	return err
+}
