@@ -3,11 +3,11 @@ version: '3.9'
 services:
   followers-managment:
     build:
-      dockerfile: dockerfile
+      dockerfile: Dockerfile
       context: ./followers
     image: microservice-followers:final
     container_name: followers-cont
-    restars: always
+    restart: always
     networks:
       - followers_server
     ports:
@@ -27,6 +27,8 @@ services:
   neo4j:
     image: neo4j
     restart: always
+    networks:
+      - followers_server
     ports:
       # bolt
       - "7687:7687"
@@ -51,3 +53,8 @@ services:
       - neo4j_data:/data
 volumes:
   neo4j_data:   
+
+networks:
+  followers_server:
+    name: followers_server
+    driver: bridge

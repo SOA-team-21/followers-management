@@ -49,9 +49,6 @@ func main() {
 	router.HandleFunc("/followers/{toFollow}/{follower}", handler.Follow).Methods("POST")
 	router.HandleFunc("/followers/{toUnFollow}/{follower}", handler.UnFollow).Methods("DELETE")
 
-	println("Server starting")
-	log.Fatal(http.ListenAndServe(port, router))
-
 	cors := gorillaHandlers.CORS(gorillaHandlers.AllowedOrigins([]string{"*"}))
 
 	//Initialize the server
@@ -74,6 +71,7 @@ func main() {
 
 	sigCh := make(chan os.Signal)
 	signal.Notify(sigCh, os.Interrupt)
+	signal.Notify(sigCh, os.Kill)
 
 	sig := <-sigCh
 	logger.Println("Received terminate, graceful shutdown", sig)

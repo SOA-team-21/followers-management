@@ -7,6 +7,6 @@ COPY . .
 RUN go build -o followers-webapp
 
 FROM alpine
-COPY --from=tours-builder /app/followers-webapp /usr/bin/followers-webapp
+COPY --from=followers-builder /app/followers-webapp /usr/bin/followers-webapp
 EXPOSE 8080
 ENTRYPOINT ["/usr/bin/followers-webapp"]
