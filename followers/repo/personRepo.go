@@ -299,3 +299,53 @@ func (repo *PersonRepo) GetRecommended(userId string) (model.Followers, error) {
 	}
 	return followersResults.(model.Followers), nil
 }
+
+func (repo *PersonRepo) GetFollowing(userId string) (model.Followers, error) {
+	ctx := context.Background()
+	session := repo.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	userIdInt, err := strconv.ParseInt(userId, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+		MATCH (f:Person {userId: $userId})-[:IS_FOLLOWING]->(p:Person)
+		RETURN p.userId as userId, p.name as name, p.surname as surname, p.quote as quote, p.email as email
+	`
+
+	followersResults, err := session.ExecuteRead(ctx,
+		func(transaction neo4j.ManagedTransaction) (any, error) {
+			result, err := transaction.Run(ctx,
+				query,
+				map[string]interface{}{"userId": userIdInt})
+			if err != nil {
+				return nil, err
+			}
+			var followers model.Followers
+			for result.Next(ctx) {
+				record := result.Record()
+				userId, _ := record.Get("userId")
+				name, _ := record.Get("name")
+				surname, _ := record.Get("surname")
+				quote, _ := record.Get("quote")
+				email, _ := record.Get("email")
+
+				person := &model.Follower{
+					UserId:  userId.(int64),
+					Name:    name.(string),
+					Surname: surname.(string),
+					Quote:   quote.(string),
+					Email:   email.(string),
+				}
+				followers = append(followers, person)
+			}
+			return followers, nil
+		})
+	if err != nil {
+		repo.logger.Println("Error querying search:", err)
+		return nil, err
+	}
+	return followersResults.(model.Followers), nil
+}

@@ -32,6 +32,14 @@ func (s *PersonService) GetFollowers(userId string) (model.Followers, error) {
 	return people, nil
 }
 
+func (s *PersonService) GetFollowing(userId string) (model.Followers, error) {
+	people, err := s.repo.GetFollowing(userId)
+	if err != nil {
+		return nil, err
+	}
+	return people, nil
+}
+
 func (s *PersonService) GetRecommended(userId string) (model.Followers, error) {
 	people, err := s.repo.GetRecommended(userId)
 	if err != nil {
