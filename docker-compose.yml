@@ -9,7 +9,7 @@ services:
     container_name: followers-cont
     restart: always
     networks:
-      - followers_server
+      - database
     ports:
       - 8080:8080
     environment:
@@ -28,7 +28,7 @@ services:
     image: neo4j
     restart: always
     networks:
-      - followers_server
+      - database
     ports:
       # bolt
       - "7687:7687"
@@ -55,6 +55,6 @@ volumes:
   neo4j_data:   
 
 networks:
-  followers_server:
-    name: followers_server
+  database:
+    name: database
     driver: bridge

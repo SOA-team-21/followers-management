@@ -53,11 +53,8 @@ func main() {
 
 	//Initialize the server
 	server := http.Server{
-		Addr:         ":" + port,
-		Handler:      cors(router),
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
+		Addr:    ":" + port,
+		Handler: cors(router),
 	}
 
 	logger.Println("Server listening on port", port)

@@ -78,7 +78,6 @@ func (pr *PersonRepo) GetPerson(userId string) (*model.Person, error) {
 
 			if result.Next(ctx) {
 				record := result.Record()
-				id, _ := record.Get("id")
 				userId, _ := record.Get("userId")
 				name, _ := record.Get("name")
 				surname, _ := record.Get("surname")
@@ -88,7 +87,6 @@ func (pr *PersonRepo) GetPerson(userId string) (*model.Person, error) {
 				email, _ := record.Get("email")
 
 				person := &model.Person{
-					Id:      id.(int64),
 					UserId:  userId.(int64),
 					Name:    name.(string),
 					Surname: surname.(string),
