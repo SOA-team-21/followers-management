@@ -1,8 +1,8 @@
 MATCH (n)
 DETACH DELETE n;
 
-CREATE (:People {Id: -12, UserId: -12, Name: 'Lena', Surname: 'Lenić', Picture: '', Bio: '', Quote: '', Email: 'autor2@gmail.com'});
-CREATE (:People {Id: -13, UserId: -13, Name: 'Sara', Surname: 'Sarić', Picture: '', Bio: '', Quote: '', Email: 'autor3@gmail.com'});
-CREATE (:People {Id: -22, UserId: -22, Name: 'Mika', Surname: 'Mikić', Picture: '', Bio: '', Quote: '', Email: 'turista2@gmail.com'});
-CREATE (:People {Id: -23, UserId: -23, Name: 'Steva', Surname: 'Stević', Picture: '', Bio: '', Quote: '', Email: 'turista3@gmail.com'});
-CREATE (:People {Id: -21, UserId: -21, Name: 'Pera', Surname: 'Perić', Picture: '', Bio: '', Quote: '', Email: 'turista1@gmail.com'});
+CREATE (:Person {id: -12, userId: -12, name: 'Lena', surname: 'Lenić', picture: '', bio: '', quote: '', email: 'autor2@gmail.com'});
+CREATE (:Person {id: -13, userId: -13, name: 'Sara', surname: 'Sarić', picture: '', bio: '', quote: '', email: 'autor3@gmail.com'});
+CREATE (:Person {id: -22, userId: -22, name: 'Mika', surname: 'Mikić', picture: '', bio: '', quote: '', email: 'turista2@gmail.com'});
+CREATE (:Person {id: -23, userId: -23, name: 'Steva', surname: 'Stević', picture: '', bio: '', quote: '', email: 'turista3@gmail.com'});
+CREATE (:Person {id: -21, userId: -21, name: 'Pera', surname: 'Perić', picture: '', bio: '', quote: '', email: 'turista1@gmail.com'});
