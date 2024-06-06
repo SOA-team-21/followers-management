@@ -21,7 +21,7 @@ func main() {
 	timeoutContext, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
-	lis, err := net.Listen("tcp", ":8080")
+	lis, err := net.Listen("tcp", ":87")
 	if err != nil {
 		log.Fatalln(err)
 	}
